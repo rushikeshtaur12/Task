@@ -26,7 +26,6 @@ export default function Home() {
     setUserData(userDataList);
   };
   
-
   const addDataToFirestore = async () => {
     // Check if any field is empty
     if (!name || !email) {
@@ -35,11 +34,18 @@ export default function Home() {
     }
   
     try {
+      const userDataCollection = collection(db, 'userdata');
+      const userDataSnapshot = await getDocs(userDataCollection);
+      const userDataList = userDataSnapshot.docs.filter(doc => !doc.data().isDeleted);
+  
       const docRef = await addDoc(collection(db, 'userdata'), {
+        id: userDataList.length + 1, // Calculate serial number
         name: name,
         email: email,
-        message: message
+        message: message,
+        isDeleted: false // Set isDeleted to false initially
       });
+  
       console.log('Document written with ID: ', docRef.id);
       setName("");
       setEmail("");
@@ -64,7 +70,7 @@ export default function Home() {
         isDeleted: true
       });
       console.log('Document with ID ', id, ' marked as deleted');
-      alert("Data marked as deleted successfully");
+      alert("Data  deleted successfully");
       fetchUserData(); // Refresh the data after deletion
     } catch (error) {
       console.error('Error marking document as deleted: ', error);
