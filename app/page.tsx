@@ -17,14 +17,23 @@ export default function Home() {
   const fetchUserData = async () => {
     const userDataCollection = collection(db, 'userdata');
     const userDataSnapshot = await getDocs(userDataCollection);
-    const userDataList = userDataSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const userDataList = userDataSnapshot.docs
+      .filter(doc => !doc.data().isDeleted) // Filter out deleted documents
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
     setUserData(userDataList);
   };
+  
 
   const addDataToFirestore = async () => {
+    // Check if any field is empty
+    if (!name || !email) {
+      alert("name and email field is mandatory , Please fill in all fields");
+      return;
+    }
+  
     try {
       const docRef = await addDoc(collection(db, 'userdata'), {
         name: name,
@@ -41,17 +50,28 @@ export default function Home() {
       console.error('Error adding document: ', error);
     }
   };
+  
 
   const deleteUserData = async (id: string) => {
+    // Show confirmation alert before deletion
+    const confirmDelete = window.confirm("Are you sure you want to delete this data?");
+    if (!confirmDelete) {
+      return;
+    }
+    
     try {
-      await deleteDoc(doc(db, 'userdata', id));
-      console.log('Document with ID ', id, ' deleted');
-      alert("Data deleted successfully");
+      await updateDoc(doc(db, 'userdata', id), {
+        isDeleted: true
+      });
+      console.log('Document with ID ', id, ' marked as deleted');
+      alert("Data marked as deleted successfully");
       fetchUserData(); // Refresh the data after deletion
     } catch (error) {
-      console.error('Error deleting document: ', error);
+      console.error('Error marking document as deleted: ', error);
     }
   };
+  
+  
 
   const updateUserData = async (id: string) => {
     try {
