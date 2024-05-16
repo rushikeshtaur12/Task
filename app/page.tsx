@@ -27,33 +27,42 @@ export default function Home() {
     setUserData(userDataList);
   };
   const addDataToFirestore = async () => {
+    // Regular expression for email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     // Check if any field is empty
     if (!name || !email) {
-      alert("name and email field is mandatory , Please fill in all fields");
-      return;
+        alert("Name and email fields are mandatory. Please fill in all fields.");
+        return;
     }
+    // Check if email matches the pattern
+    if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
     try {
-      const userDataCollection = collection(db, 'userdata');
-      const userDataSnapshot = await getDocs(userDataCollection);
-      const userDataList = userDataSnapshot.docs.filter(doc => !doc.data().isDeleted);  
-      const docRef = await addDoc(collection(db, 'userdata'), {
-        userid: userDataList.length + 1, // Calculate serial number
-        name: name,
-        email: email,
-        message: message,
-        isDeleted: false // Set isDeleted to false initially
-      });
-  
-      console.log('Document written with ID: ', docRef.id);
-      setName("");
-      setEmail("");
-      setMessage("");
-      alert("Data added successfully");
-      fetchUserData(); // Refresh the data after adding
+        const userDataCollection = collection(db, 'userdata');
+        const userDataSnapshot = await getDocs(userDataCollection);
+        const userDataList = userDataSnapshot.docs.filter(doc => !doc.data().isDeleted);  
+        const docRef = await addDoc(collection(db, 'userdata'), {
+            userid: userDataList.length + 1, // Calculate serial number
+            name: name,
+            email: email,
+            message: message,
+            isDeleted: false // Set isDeleted to false initially
+        });
+
+        console.log('Document written with ID: ', docRef.id);
+        setName("");
+        setEmail("");
+        setMessage("");
+        alert("Data added successfully");
+        fetchUserData(); // Refresh the data after adding
     } catch (error) {
-      console.error('Error adding document: ', error);
+        console.error('Error adding document: ', error);
     }
-  };
+};
   
 
   const deleteUserData = async (id: string) => {
@@ -123,6 +132,7 @@ export default function Home() {
               className="border rounded-lg py-2 px-3 w-full focus:outline-none dark:text-black focus:border-blue-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              pattern='/^[^\s@]+@[^\s@]+\.[^\s@]+$/'
             />
           </div>
           <div>
