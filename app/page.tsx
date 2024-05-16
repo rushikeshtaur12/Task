@@ -37,7 +37,7 @@ export default function Home() {
       const userDataSnapshot = await getDocs(userDataCollection);
       const userDataList = userDataSnapshot.docs.filter(doc => !doc.data().isDeleted);  
       const docRef = await addDoc(collection(db, 'userdata'), {
-        id: userDataList.length + 1, // Calculate serial number
+        userid: userDataList.length + 1, // Calculate serial number
         name: name,
         email: email,
         message: message,
@@ -57,23 +57,24 @@ export default function Home() {
   
 
   const deleteUserData = async (id: string) => {
-    // Show confirmation alert before deletion
     const confirmDelete = window.confirm("Are you sure you want to delete this data?");
     if (!confirmDelete) {
       return;
     }
-    
+  
     try {
       await updateDoc(doc(db, 'userdata', id), {
-        isDeleted: true
+        isDeleted: true,
       });
       console.log('Document with ID ', id, ' marked as deleted');
-      alert("Data  deleted successfully");
+      alert("Data marked as deleted successfully");
       fetchUserData(); // Refresh the data after deletion
     } catch (error) {
-      console.error('Error marking document as deleted: ', error);
+      alert('Error marking document as deleted: ' + error);
     }
   };
+  
+
   const updateUserData = async (id: string) => {
     try {
       await updateDoc(doc(db, 'userdata', id), {
@@ -154,9 +155,7 @@ export default function Home() {
           </thead>
           <tbody>
             {userData.map((data) => (
-              //@ts-ignore
               <tr key={data.id}>
-              
                 <td className="border border-gray-300 px-4 py-2">{data.name}</td>
                 <td className="border border-gray-300 px-4 py-2">{data.email}</td>
                 <td className="border border-gray-300 px-4 py-2">{data.message}</td>
