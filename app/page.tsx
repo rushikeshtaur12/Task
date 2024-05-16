@@ -8,7 +8,7 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [userData, setUserData] = useState([]);
+  const [userData, setUserData] = useState<{ id: string, name: string, email: string, message: string }[]>([]);
 
   useEffect(() => {
     fetchUserData();
