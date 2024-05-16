@@ -23,21 +23,19 @@ export default function Home() {
         id: doc.id,
         ...doc.data()
       }));
+      //@ts-ignore
     setUserData(userDataList);
   };
-  
   const addDataToFirestore = async () => {
     // Check if any field is empty
     if (!name || !email) {
       alert("name and email field is mandatory , Please fill in all fields");
       return;
     }
-  
     try {
       const userDataCollection = collection(db, 'userdata');
       const userDataSnapshot = await getDocs(userDataCollection);
-      const userDataList = userDataSnapshot.docs.filter(doc => !doc.data().isDeleted);
-  
+      const userDataList = userDataSnapshot.docs.filter(doc => !doc.data().isDeleted);  
       const docRef = await addDoc(collection(db, 'userdata'), {
         id: userDataList.length + 1, // Calculate serial number
         name: name,
@@ -76,9 +74,6 @@ export default function Home() {
       console.error('Error marking document as deleted: ', error);
     }
   };
-  
-  
-
   const updateUserData = async (id: string) => {
     try {
       await updateDoc(doc(db, 'userdata', id), {
@@ -161,6 +156,7 @@ export default function Home() {
             {userData.map((data) => (
               //@ts-ignore
               <tr key={data.id}>
+              
                 <td className="border border-gray-300 px-4 py-2">{data.name}</td>
                 <td className="border border-gray-300 px-4 py-2">{data.email}</td>
                 <td className="border border-gray-300 px-4 py-2">{data.message}</td>
